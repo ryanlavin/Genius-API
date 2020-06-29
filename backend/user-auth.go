@@ -27,7 +27,6 @@ func Orig(res http.ResponseWriter, req *http.Request) {
 }
 
 func Login(res http.ResponseWriter, req *http.Request) {
-	http.ServeFile(res, req, "../frontend/successForm.html")
 
 	username = req.FormValue("username")
 	password = req.FormValue("password")
@@ -36,30 +35,28 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	var dbPass string
 
 	err = db.QueryRow("SELECT username, password FROM user WHERE username=?", username).Scan(&dbUser, &dbPass)
-	if err != nil {
-		fmt.Println("username at least")
-		http.Redirect(res, req, "/login", 301)
+	if err == sql.ErrNoRows {
+		http.Redirect(res, req, "/", 301)
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(dbPass), []byte(password))
 	if err != nil {
-		fmt.Println("password too")
-		http.Redirect(res, req, "/login", 301)
+		http.Redirect(res, req, "/", 301)
 		return
 	}
+	http.Redirect(res, req, "/homepage", 301)
 }
 
 func Register(res http.ResponseWriter, req *http.Request) {
-	//http.ServeFile(res, req, "../frontend/register.html")
+
 	if req.Method != "POST" {
-		fmt.Println("HM")
 		http.ServeFile(res, req, "../frontend/register.html")
 		return
 	}
 
-	fmt.Println("HM")
 	username = req.FormValue("username")
 	password = req.FormValue("password")
+	fmt.Println(username, password)
 	err = db.QueryRow("SELECT username FROM user WHERE username=?", username).Scan(&user)
 	if err == sql.ErrNoRows {
 		cryptedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -67,14 +64,13 @@ func Register(res http.ResponseWriter, req *http.Request) {
 			panic(err.Error())
 		}
 		_, err = db.Exec("INSERT INTO user(username, password) VALUES(?, ?)", username, cryptedPassword)
-		//defer req.ParseForm()
-		//defer fmt.Println(req.Form["username"])
-		//defer fmt.Println(req.Form["password"])
 		if err != nil {
 			panic(err.Error())
 		}
+		http.Redirect(res, req, "/", 301)
 		return
 	}
+
 	if err != nil {
 		panic(err.Error())
 	}
@@ -82,8 +78,12 @@ func Register(res http.ResponseWriter, req *http.Request) {
 
 }
 
+func Homepage(res http.ResponseWriter, req *http.Request) {
+	http.ServeFile(res, req, "../frontend/homepage.html")
+}
+
 func main() {
-	db, err = sql.Open("mysql", "root:lusMonkey2412!@/user_auth")
+	db, err = sql.Open("mysql", "root:password@/user_auth")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -97,6 +97,7 @@ func main() {
 	router.HandleFunc("/", Orig)
 	router.HandleFunc("/login", Login)
 	router.HandleFunc("/register", Register)
+	router.HandleFunc("/homepage", Homepage)
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
