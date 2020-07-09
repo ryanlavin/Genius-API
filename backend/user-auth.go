@@ -1,15 +1,16 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/gorilla/mux"
 	//"github.com/sirupsen/logrus"
 	//"html/template"
+	"io/ioutil"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"net/url"
+	//"net/url"
 )
 
 var db *sql.DB
@@ -96,21 +97,31 @@ func PullLyrics(res http.ResponseWriter, req *http.Request) {
 	artist := req.FormValue("artist")
 	title := req.FormValue("title")
 
-
+/*
 	if err != nil {
 		panic(err.Error())
 	}
-	req, err = http.NewRequest("GET", "https://api.lyrics.ovh/v1/artist/title", nil)
 	if err != nil {
 		panic(err.Error())
 	}
+	*/
 	//q := req.URL.Query()
-	q := url.Values{}
-	q.Add("artist", artist)
-	q.Add("title", title)
-	//fmt.Println(q.Get("artist"))
-	//fmt.Println(q.Get("title"))
-	//fmt.Println(req.URL.RawQuery)
+	s := "https://api.lyrics.ovh/v1/"
+	s = s + artist + "/"
+	s = s + title + "/"
+	
+	req, err = http.NewRequest("GET", s, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	resp, err := http.Get(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 	http.ServeFile(res, req, "../frontend/pullLyrics.html")
 }
 
