@@ -1,0 +1,55 @@
+body {
+	background-color: #EEE;
+	width: 250px;
+	margin: auto;
+}
+
+#container {
+	background-color: white;
+	margin: auto;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#content {
+	padding: 10px 10px 10px 10px;
+}
+
+#nav {
+	width: 90px;
+	float: left;
+}
+
+#main {
+	width: 90px;
+	float: right;
+	overflow: scroll;
+}
+
+/* For class use . and a # for id */
+.selected {
+	font-weight: bold;
+	color: black;
+}
+
+.unselected {
+	text-decoration: none;
+	color: #0656C8;
+}
+
+#nav ul {
+	padding: 10;
+}
+
+.SongTitle {
+	cursor: pointer;
+	font-size: 12px;
+	margin: auto;
+	display: inline-block;
+	font-weight: bold;
+}
+
+ol {
+	list-style: none;
+}
+
