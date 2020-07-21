@@ -2,29 +2,31 @@
 
 <html>
 	<head> 
-		<title> Hello! Welcome to Ryan's Genius Database </title>
+		<title> Homepage </title>
 		<link rel="stylesheet" type="text/css" href="homepage.css" />
+		<meta name="keywords" content="golang,pagser,goquery,html,page,parser,colly">
 	</head>
+
 	<body>
 		<div id="container">
 			<div id="header">
 			</div>
 			<div id="content">
-				<div id="nav">
+				<div class="nav">
 					<h3> Navigation  </h3>
 					<ul>
-						<li> <a class="selected" href="">Home </a> </li>
+						<li> <a class="selected" href=""> Home </a></li>
 						<li> <a class="unselected" href=""> About </a> </li>
 						<li> <a class="unselected"  href=""> Contact </a> </li>
-						<li> <a class="unselected" href="http://localhost:8080/pulllyrics">Get Lyrics </a> </li>
+						<li> <a class="unselected" method="GET" href="/pulllyrics">Get Lyrics </a> </li>
 					</ul>
 			</div>
-			<div id="main">
+			<div class="main">
 			<ul>
 				<form method="GET" action="/savedlyrics">
-				<li> <a class="SongTitle" href="">1st Song </a> </li>
-				<li> <a class="SongTitle" href="">2nd Song </a> </li>
-				<li> <a class="SongTitle" href="">3rd Song </a> </li>
+				<li> <a class="SongTitle" runat="server" href="">1st Song </a> </li>
+				<li> <a class="SongTitle" runat="server" href="">2nd Song </a> </li>
+				<li> <a class="SongTitle" runat="server" href="">3rd Song </a> </li>
 			</ul> </form>
 			</div>
 	</body>

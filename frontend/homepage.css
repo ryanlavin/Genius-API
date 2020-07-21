@@ -15,12 +15,12 @@ body {
 	padding: 10px 10px 10px 10px;
 }
 
-#nav {
+.nav {
 	width: 90px;
 	float: left;
 }
 
-#main {
+.main ul{
 	width: 90px;
 	float: right;
 	overflow: scroll;
@@ -41,7 +41,7 @@ body {
 	padding: 10;
 }
 
-.SongTitle {
+.SongTitle li {
 	cursor: pointer;
 	font-size: 12px;
 	margin: auto;

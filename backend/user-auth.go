@@ -3,15 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
+	"github.com/foolin/pagser"
 	"github.com/gorilla/mux"
+	"encoding/json"
 	//"github.com/sirupsen/logrus"
 	//"html/template"
-	"io/ioutil"
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"log"
+	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 	//"net/url"
 )
 var ctx context.Context
@@ -22,6 +26,45 @@ var password string
 var user string
 var songName string
 
+const rawPageHtml = `
+<!DOCTYPE HTML>
+<html>
+	<head> 
+		<title> Homepage </title>
+		<link rel="stylesheet" type="text/css" href="homepage.css" />
+		<meta name="keywords" content="golang,pagser,goquery,html,page,parser,colly">
+	</head>
+
+	<body>
+		<div id="container">
+			<div id="header">
+			</div>
+			<div id="content">
+				<div class="nav">
+					<h3> Navigation  </h3>
+					<ul>
+						<li> <a class="selected" href=""> Home </a></li>
+						<li> <a class="unselected" href=""> About </a> </li>
+						<li> <a class="unselected"  href=""> Contact </a> </li>
+						<li> <a class="unselected" method="GET" href="/pulllyrics">Get Lyrics </a> </li>
+					</ul>
+			</div>
+			<div class="main">
+			<ul>
+				<form method="GET" action="/savedlyrics">
+				<li> <a class="SongTitle" runat="server" href="">1st Song </a> </li>
+				<li> <a class="SongTitle" runat="server" href="">2nd Song </a> </li>
+				<li> <a class="SongTitle" runat="server" href="">3rd Song </a> </li>
+			</ul> </form>
+			</div>
+	</body>
+
+</html>
+`
+
+
+
+
 type dbHandler struct {
 	artist string
 	title string
@@ -29,6 +72,16 @@ type dbHandler struct {
 	file string
 }
 
+type HomepageData struct {
+	//title string `pagser:"title"`
+	//h3 string `pagser:"h3"`
+	Keywords []string `pagser:"meta[name='keywords']->attrSplit(content)"`
+	Navs []struct {
+		Name string `pagser:"SongTitle->text()"`
+		URL string `pagser:"SongTitle->attr(href)"`	
+	} `pagser:".SongTitle li"`
+}
+ 
 type song interface {
 	getLyrics()
 	//reorderLyrics()
@@ -36,8 +89,8 @@ type song interface {
 
 // Implements song interface, this function executes upon a POST request being handled by PullLyrics
 // Checks if user input of the artist and song name is in the database and proceeds to pull the lyrics from the API and stream them both into the database and into a txt file for easy retrieval
-func (h dbHandler) getLyrics() (req1 *http.Request) {
-	req, err := http.NewRequest("GET", h.title, nil)
+func (h dbHandler) getLyrics() (req *http.Request) {
+	req, err := http.NewRequest("GET", h.url, nil)
 	checkErr(err)	
 
 	resp, err := http.Get(h.url)
@@ -46,11 +99,13 @@ func (h dbHandler) getLyrics() (req1 *http.Request) {
 	
 	body, err := ioutil.ReadAll(resp.Body)
 	checkErr(err)
-	
+
+	songLink := strings.TrimRight(h.file, ".txt")
+	fmt.Println("songLink:", songLink)
 	err = db.QueryRow("SELECT fileName FROM song WHERE fileName=?", h.file).Scan(&h.file)	
 	if err == sql.ErrNoRows {
 		num := findOrder()
-		_, err = db.Exec("INSERT INTO song(fileName, songLink, songOrder) VALUES(?, ?, ?)", h.file, h.url, num)
+		_, err = db.Exec("INSERT INTO song(fileName, songLink, songOrder) VALUES(?, ?, ?)", h.file, songLink, num)
 		checkErr(err)	
 	
 		file, err := os.Create(h.file)
@@ -137,8 +192,31 @@ func Register(res http.ResponseWriter, req *http.Request) {
 
 }
 
+func toJson(v interface{}) string {
+	data, _ := json.MarshalIndent(v, "", "\t")
+	return string(data)
+}
+
 // First page dealt after successfully signing in
 func Homepage(res http.ResponseWriter, req *http.Request) {
+	//Song1 := req.FormValue("1st Song")
+	//Song2 := req.FormValue("2nd Song")
+	//Song3 := req.FormValue("3rd Song")
+	p := pagser.New()
+	var data HomepageData
+	//err = p.Parse(&data, "~/repositories/genius-api/frontend/homepage.html")
+	err = p.Parse(&data, rawPageHtml)	
+	checkErr(err)
+	log.Printf("Page data json: \n-------------\n%v\n-------------\n", toJson(data))
+
+	var row1, row2, row3 string
+	err = db.QueryRow("SELECT songLink from song WHERE songOrder=0").Scan(&row1)
+	checkErr(err)
+	err = db.QueryRow("SELECT songLink from song WHERE songOrder=1").Scan(&row2)
+	checkErr(err)
+	err = db.QueryRow("SELECT songLink from song WHERE songOrder=2").Scan(&row3)
+	checkErr(err)
+	fmt.Println("rows:", row1, row2, row3)
 	http.ServeFile(res, req, "../frontend/homepage.html")
 }
 
@@ -152,12 +230,11 @@ func PullLyrics(res http.ResponseWriter, req *http.Request) {
 	}
 	artist := req.FormValue("artist")
 	title := req.FormValue("title")
-	link := "https://api.lyrics.ovh/v1/"
-	link = link + artist + "/"
-	link = link + title + "/"
-
+	url := "https://api.lyrics.ovh/v1/"
+	url = url + artist + "/"
+	url = url + title + "/"
 	fileName := artist + " - " + title + ".txt"
-	h := dbHandler{artist, title, link, fileName}	
+	h := dbHandler{artist, title, url, fileName}	
 	req = h.getLyrics()	
 	http.ServeFile(res, req, "../frontend/pullLyrics.html")
 }
@@ -168,7 +245,7 @@ func SavedLyrics(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	db, err = sql.Open("mysql", "root:password@/user_auth")
+	db, err = sql.Open("mysql", "username:password@/user_auth")
 	if err != nil {
 		panic(err.Error())
 	}
