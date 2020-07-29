@@ -1,0 +1,19 @@
+{
+	"DBHost": "mysql",
+	"DBName": "user_auth",
+	"DBUser": "root",
+	"DBPass": "",
+	"AuthTable": "user_auth",
+	"SongTable": "song",
+
+	"IndexURL": "/",
+	"IndexFile": "../frontend/index.html",
+	"RegisterURL": "/register",
+	"RegisterFile": "../frontend/register.html",
+	"LoginURL": "/login",
+	"HomepageURL": "/homepage",
+	"HomepageFile": "../frontend/homepage.html",	
+	"PullLyricsURL": "/pulllyrics",
+	"PullLyricsFile": "../frontend/pullLyrics.html"
+
+}
