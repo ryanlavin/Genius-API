@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+
+		<title> Homepage </title>
+		<link rel="stylesheet" type="text/css" href="frontend/homepage.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>	
+		<script src="artist.json" type="text/javascript"></script>
+	</head>
+
+	<body> 
+		<div id="container">
+			<div id="header">
+			</div>
+			<div id="content">
+				<div class="nav">
+					<h3> Navigation  </h3>
+					<ul>
+						<li> <a class="selected" href=""> Home </a></li>
+						<li> <a class="unselected" href=""> About </a> </li>
+						<li> <a class="unselected"  href=""> Contact </a> </li>
+						<li> <a class="unselected" method="GET" href="/pulllyrics">Get Lyrics </a> </li>
+					</ul>
+			</div>
+			<div class="main">
+				<ul> 
+				<form id="SongList" method="GET" >
+				<li> <a id="Song1" name="Song1" class="SongTitle" runat="server" href="">1st Song </a> </li>
+				<li> <a id="Song2" name="Song2" class="SongTitle" runat="server" href="">2nd Song </a> </li>
+				<li> <a id="Song3" name="Song3" class="SongTitle" runat="server" href="">3rd Song </a> </li>
+			</ul> </form>
+			</div>
+
+	<script> 
+		$(function() {
+			function loadJSON(callback) {
+                    		var xobj = new XMLHttpRequest();
+                    		xobj.overrideMimeType("application/json");
+                    		xobj.onreadystatechange = function () {
+                            	
+				if (xobj.readyState == 4 && xobj.status == "200") {
+        			         // Required use of an anonymous callback as .open will NOT return 
+                       		         // a value but simply returns undefined in asynchronous mode
+                               		 callback(xobj.responseText);
+                            	} else {
+                                callback("[{\"Nothing\"}]");
+                            }
+                        };
+
+                    xobj.open('GET', 'artist.json', true);
+                    // Maybe you require use of an unknown origin.
+                    /*xobj.setRequestHeader("Access-Control-Allow-Origin","*");*/
+                    xobj.send(null);  
+                };
+            
+            loadJSON(function(response) {
+                    // Parse JSON string into object
+                    // Parse JSON array string into object
+                    document.getElementById("Song1").innerHTML = JSON.stringify(response);
+                });
+}); </script>
+			<!-- <script> document.getElementById("Song").innerHTML = "Halftime - Nas"; </script> -->
+	</body>
+
+</html>

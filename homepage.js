@@ -47,24 +47,35 @@ document.getElementById('foo').appendChild(makeUL(json));
 // also how do you iterate through list in js
 //$.getJSON('/homepage', function(songs) {
 
- function getJSON(songs) {     	 
-	for(let i = 1; i <= 3; i++) {
+// July 29 currently trying to figure out how to parse json file 
+//either from html/javascript to load onto html “/homepage” but 
+//as there are issues loading locally-held files from javascript 
+//(from security issues that could cause) I may have to do it 
+//from a server XMLHttpRequest()
+/*
+function getJSON() {     	 
+	//for(let i = 1; i <= 3; i++) {
 		var xobj = new XMLHttpRequest();
 		//xobj.overrideMimeType("application/json");
-		xobj.open('GET', "../../backend/artist.json", true);
-		xobj.responseType = 'json';
-		xobj.send();
+		//xobj.open('GET', "../backend/artist.json", true);
+		//xobj.responseType = 'json';
 		xobj.onreadystatechange = function () {
           		if (xobj.readyState == 4 && xobj.status == "200") {
-            			callback(xobj.responseText);
+            			document.getElementById("Song1").innerHTML = "Nas";	
+            			document.getElementById("Song2").innerHTML = this.ResponseText;	
+            			document.getElementById("Song3").innerHTML = this.ResponseText;	
+				//callback(xobj.responseText);
           		}
+			xobj.open('GET', "backend/artist.json", true);
+			xobj.send();
 		};
-		var Song = JSON.Parse(
-		var strSong = "Song" + string(i)
-		var Song = document.getElementById(strSong).innerText;
-		document.getElementById(strSong).innerHTML = Song;
-		$(strSong).html(songs)
-	}
+		//var Song = JSON.Parse(
+		//var strSong = "Song" + string(i)
+		//var Song = document.getElementById(strSong).innerText;
+		//document.getElementById(strSong).innerHTML = Song;
+		//$(strSong).html(songs)
+	//}
         
         //$(".mypanel").html(text);
     });
+    */

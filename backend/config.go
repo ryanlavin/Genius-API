@@ -23,6 +23,8 @@ type Conf struct {
 	HomepageFile   string `json:"HomepageFile"`
 	PullLyricsURL  string `json:"PullLyricsURL"`
 	PullLyricsFile string `json:"PullLyricsFile"`
+	JsonURL string `json:"jsonURL"`
+	JsonFile string `json:"jsonFile"`
 }
 
 func (s server) LoadConfig() *Conf {
@@ -41,7 +43,7 @@ func getConfig() *Conf {
 		DBHost:         "mysql",
 		DBName:         "user_auth",
 		DBUser:         "root",
-		DBPass:         "",
+		DBPass:         "lusMonkey2412!",
 		AuthTable:      "user_auth",
 		SongTable:      "song",
 		IndexURL:       "/",

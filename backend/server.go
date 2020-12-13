@@ -31,6 +31,7 @@ func (s server) StartServer() error {
 	router.HandleFunc(s.Config.RegisterURL, s.Register)
 	router.HandleFunc(s.Config.HomepageURL, s.Homepage)
 	router.HandleFunc(s.Config.PullLyricsURL, s.PullLyrics)
+	router.HandleFunc(s.Config.JsonURL, s.Json)
 	err = http.ListenAndServe(":8080", router)
 	checkErr(err)
 	return nil
@@ -65,6 +66,26 @@ func (s server) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	http.Redirect(res, req, s.Config.HomepageURL, 301)
+}
+
+func (s server) Json(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "GET" {
+		http.ServeFile(res, req, s.Config.HomepageFile)
+		return
+	}
+	jsonFile, err := os.Open(s.Config.JsonFile)
+	checkErr(err)
+	defer jsonFile.Close()
+	var data interface{}	
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+    	json.Unmarshal([]byte(byteValue), &data)
+
+    	fmt.Println(data)
+	jsonData, err := json.Marshal(&data)
+	checkErr(err)
+	res.Header().Set("Content-Type", "application/json")
+	res.Write(jsonData)
+
 }
 
 // Form dealt to register account in mysql db, submitting redirects to index form

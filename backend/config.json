@@ -2,7 +2,7 @@
 	"DBHost": "mysql",
 	"DBName": "user_auth",
 	"DBUser": "root",
-	"DBPass": "",
+	"DBPass": "lusMonkey2412!",
 	"AuthTable": "user_auth",
 	"SongTable": "song",
 
@@ -12,8 +12,9 @@
 	"RegisterFile": "../frontend/register.html",
 	"LoginURL": "/login",
 	"HomepageURL": "/homepage",
-	"HomepageFile": "../frontend/homepage.html",	
+	"HomepageFile": "../homepage.html",	
 	"PullLyricsURL": "/pulllyrics",
-	"PullLyricsFile": "../frontend/pullLyrics.html"
-
+	"PullLyricsFile": "../frontend/pullLyrics.html",
+	"JsonURL": "/artist.json",
+	"JsonFile": "../artist.json"
 }
